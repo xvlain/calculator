@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<script>
+!(function(j,a,g){j.__itrace_conf = {bid: 'f43basl8-6nqu7l3w',rel: '0.0.1', spa: true, uid: '', plugins:['jserror','interface','perf','resource','flow','blank']};var b = a.createElement("script");var d = a.getElementsByTagName("script")[0];b.type = "text/javascript";b.crossorigin = true;b.async = true;b.onload = function(){j.__itrace && j.__itrace.setReady()};d.parentNode.insertBefore(b,d);b.src = g})(window, document, "https://g.alicdn.com/woodpeckerx/itrace-next/itrace.iife.js")
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>在线计算器</title>
+<meta name="description" content="简洁好用的在线计算器，支持四则运算、百分比等日常计算。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2312b7f5'/%3E%3Crect x='16' y='10' width='32' height='13' rx='3' fill='white'/%3E%3Ccircle cx='22' cy='33' r='3.4' fill='white'/%3E%3Ccircle cx='32' cy='33' r='3.4' fill='white'/%3E%3Ccircle cx='42' cy='33' r='3.4' fill='white'/%3E%3Ccircle cx='22' cy='45' r='3.4' fill='white'/%3E%3Ccircle cx='32' cy='45' r='3.4' fill='white'/%3E%3Crect x='38' y='41' width='8' height='8' rx='2' fill='white'/%3E%3C/svg%3E">
+<style>
+/* SECTION: base */
+:root{
+  --brand:#12b7f5; --brand-deep:#0ba2dd; --brand-soft:#e3f5fd;
+  --radius:14px;
+}
+html[data-theme="light"]{
+  --bg:#eef1f5; --app-bg:#f5f7fa; --panel:#ffffff; --line:#e6e9ef;
+  --txt:#1f2329; --txt2:#8a919f; --txt3:#b3b9c4;
+  --bubble-other:#ffffff; --sys:#f0f2f5; --sys-txt:#9aa1ad;
+  --key:#ffffff; --key-txt:#1f2329; --key-fn:#e9edf3; --key-fn-txt:#3c4250;
+  --key-op:#d9effd; --key-op-txt:#0ba2dd;
+  --input-bg:#f2f4f7; --shadow:0 1px 3px rgba(31,35,41,.06);
+  --menu-bg:#ffffff; --mask:rgba(20,24,30,.35);
+}
+html[data-theme="dark"]{
+  --bg:#0f1114; --app-bg:#15171b; --panel:#1e2126; --line:#2b2f36;
+  --txt:#e9eaec; --txt2:#8d939e; --txt3:#5c626d;
+  --bubble-other:#282c33; --sys:#24272d; --sys-txt:#7c828d;
+  --key:#23262c; --key-txt:#e9eaec; --key-fn:#2c3038; --key-fn-txt:#c8cdd6;
+  --key-op:#12384e; --key-op-txt:#3fc3f7;
+  --input-bg:#26292f; --shadow:0 1px 3px rgba(0,0,0,.35);
+  --menu-bg:#282c33; --mask:rgba(0,0,0,.5);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  background:var(--bg); color:var(--txt);
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit}
+input{font-family:inherit;outline:none;border:none;background:none;color:inherit}
+.screen{display:none}
+.screen.active{display:block}
+.app{max-width:460px;margin:0 auto;min-height:100vh;min-height:100dvh;background:var(--app-bg);display:flex;flex-direction:column;position:relative}
+@media (min-width:520px){
+  body{padding:0}
+  .app{box-shadow:0 0 24px rgba(15,20,30,.10)}
+}
+
+/* SECTION: screen-calc */
+#screen-calc .app{justify-content:space-between;padding:0 0 14px}
+.calc-head{text-align:center;padding:26px 16px 6px}
+.calc-head h1{font-size:20px;font-weight:600;letter-spacing:1px}
+.calc-head .calc-sub{font-size:12px;color:var(--txt2);margin-top:5px}
+.calc-card{margin:10px 16px 0;background:var(--panel);border-radius:20px;box-shadow:var(--shadow);padding:18px 14px 14px}
+.calc-display{padding:6px 10px 16px;text-align:right;min-height:104px;display:flex;flex-direction:column;justify-content:flex-end}
+.calc-expr{font-size:15px;color:var(--txt2);min-height:22px;word-break:break-all}
+.calc-out{font-size:46px;font-weight:300;line-height:1.15;word-break:break-all;font-variant-numeric:tabular-nums;transition:color .2s}
+.calc-out.small{font-size:30px}
+.calc-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.key{
+  height:58px;border-radius:14px;font-size:22px;font-weight:500;
+  background:var(--key);color:var(--key-txt);box-shadow:var(--shadow);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .06s,opacity .06s;user-select:none;
+}
+.key:active{transform:scale(.94);opacity:.85}
+.key.fn{background:var(--key-fn);color:var(--key-fn-txt);font-size:19px}
+.key.op{background:var(--key-op);color:var(--key-op-txt)}
+.key.eq{background:var(--brand);color:#fff;font-size:26px}
+.key.eq:active{background:var(--brand-deep)}
+.key.zero{grid-column:span 2}
+.calc-foot{text-align:center;font-size:11px;color:var(--txt3);padding:14px 16px 4px}
+#screen-calc.unlocked .calc-out{color:var(--brand)}
+#screen-calc.unlocked .app{opacity:.4;transition:opacity .3s}
+
+/* SECTION: screen-login */
+#screen-login.active{display:flex}
+#screen-login{min-height:100vh;min-height:100dvh;background:linear-gradient(165deg,#3ec6ff 0%,#12b7f5 46%,#0ba2dd 100%)}
+.login-wrap{width:100%;max-width:460px;margin:0 auto;padding:0 26px;display:flex;flex-direction:column;align-items:center}
+.login-logo{width:82px;height:82px;margin-top:9vh;background:#fff;border-radius:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 26px rgba(6,60,90,.22)}
+.login-logo svg{width:52px;height:52px}
+.login-wrap h2{color:#fff;font-size:24px;font-weight:600;margin-top:18px;letter-spacing:2px}
+.login-sub{color:rgba(255,255,255,.85);font-size:13px;margin-top:8px}
+.login-card{width:100%;background:#fff;border-radius:18px;padding:26px 22px 22px;margin-top:34px;box-shadow:0 12px 30px rgba(6,60,90,.18)}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;color:#8a919f;margin-bottom:7px}
+.field input{
+  width:100%;height:48px;background:#f2f4f7;border-radius:12px;
+  padding:0 14px;font-size:16px;color:#1f2329;
+}
+.field input:focus{background:#eaf6fd;box-shadow:inset 0 0 0 1.5px #12b7f5}
+.login-err{font-size:13px;color:#f25749;min-height:20px;margin:2px 0 8px}
+.btn-primary{
+  width:100%;height:48px;border-radius:12px;background:#12b7f5;color:#fff;
+  font-size:17px;font-weight:600;letter-spacing:6px;text-indent:6px;
+  transition:background .15s;
+}
+.btn-primary:active{background:#0ba2dd}
+.login-tip{font-size:12px;color:#a3a9b4;text-align:center;margin-top:14px;line-height:1.6}
+
+/* SECTION: screen-main */
+.main-app{height:100vh;height:100dvh;overflow:hidden}
+#main-header{
+  flex:0 0 auto;height:50px;display:flex;align-items:center;justify-content:center;
+  background:var(--panel);border-bottom:1px solid var(--line);
+  padding-top:env(safe-area-inset-top);
+}
+#main-header h2{font-size:17px;font-weight:600}
+.panel{display:none;flex:1;min-height:0;flex-direction:column;background:var(--app-bg)}
+.panel.active{display:flex}
+
+/* SECTION: panel-chat */
+.conv-scroll{flex:1;min-height:0;overflow-y:auto}
+.conv-item{
+  display:flex;align-items:center;gap:12px;padding:13px 16px;
+  background:var(--panel);border-bottom:1px solid var(--line);
+  cursor:pointer;
+}
+.conv-item:active{background:var(--input-bg)}
+.avatar{
+  width:46px;height:46px;border-radius:12px;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:16px;font-weight:600;letter-spacing:1px;
+}
+.conv-info{flex:1;min-width:0}
+.conv-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.conv-name{font-size:16px;font-weight:500}
+.conv-time{font-size:12px;color:var(--txt3);flex:0 0 auto}
+.conv-preview{font-size:13px;color:var(--txt2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty{padding:70px 30px;text-align:center;color:var(--txt2);font-size:14px;line-height:1.9}
+.empty .empty-icon{font-size:34px;margin-bottom:10px;opacity:.5}
+.empty b{color:var(--brand);font-weight:500}
+
+.room-wrap{flex:1;min-height:0;display:flex;flex-direction:column}
+.room-head{
+  flex:0 0 auto;display:flex;align-items:center;gap:6px;
+  padding:9px 10px;background:var(--panel);border-bottom:1px solid var(--line);
+}
+.room-back{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px}
+.room-back:active{background:var(--input-bg)}
+.room-back svg{width:22px;height:22px;color:var(--txt)}
+.room-title{min-width:0}
+.room-name{font-size:16px;font-weight:600}
+.room-status{font-size:11px;margin-top:1px}
+.room-status.on{color:#3ec46d}
+.room-status.off{color:var(--txt3)}
+.msg-list{flex:1;min-height:0;overflow-y:auto;padding:14px 14px 8px}
+.time-label{
+  text-align:center;font-size:11px;color:var(--sys-txt);margin:10px 0;
+}
+.time-label span{background:var(--sys);border-radius:6px;padding:3px 8px}
+.msg{display:flex;margin:10px 0}
+.msg.self{justify-content:flex-end}
+.bubble{
+  max-width:72%;padding:10px 13px;border-radius:14px;font-size:15px;line-height:1.5;
+  word-break:break-word;white-space:pre-wrap;position:relative;box-shadow:var(--shadow);
+}
+.msg.other .bubble{background:var(--bubble-other);border-top-left-radius:4px}
+.msg.self .bubble{background:var(--brand);color:#fff;border-top-right-radius:4px}
+.edited{font-size:10px;opacity:.62;margin-left:6px;white-space:nowrap}
+.sys-msg{text-align:center;margin:10px 0;font-size:12px;color:var(--sys-txt)}
+#edit-banner{
+  flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+  padding:7px 14px;background:var(--brand-soft);color:#0b87b6;font-size:13px;
+  border-top:1px solid var(--line);
+}
+html[data-theme="dark"] #edit-banner{background:#12384e;color:#7cd0f7}
+#edit-cancel{color:inherit;font-size:13px;padding:4px 8px}
+.input-bar{
+  flex:0 0 auto;display:flex;align-items:center;gap:10px;
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+  background:var(--panel);border-top:1px solid var(--line);
+}
+#msg-input{
+  flex:1;min-width:0;height:42px;background:var(--input-bg);border-radius:21px;
+  padding:0 16px;font-size:16px;
+}
+.send-btn{
+  flex:0 0 auto;height:42px;padding:0 20px;border-radius:21px;
+  background:var(--brand);color:#fff;font-size:15px;font-weight:500;
+}
+.send-btn:active{background:var(--brand-deep)}
+
+/* SECTION: panel-friends */
+.add-bar{
+  flex:0 0 auto;display:flex;gap:10px;padding:14px 16px 10px;
+}
+#add-id{
+  flex:1;min-width:0;height:44px;background:var(--panel);border-radius:12px;
+  padding:0 14px;font-size:16px;box-shadow:var(--shadow);
+}
+#btn-add{
+  flex:0 0 auto;height:44px;padding:0 18px;border-radius:12px;
+  background:var(--brand);color:#fff;font-size:15px;font-weight:500;
+}
+#btn-add:active{background:var(--brand-deep)}
+.friend-scroll{flex:1;min-height:0;overflow-y:auto}
+.friend-item{
+  display:flex;align-items:center;gap:12px;padding:12px 16px;
+  background:var(--panel);border-bottom:1px solid var(--line);cursor:pointer;
+}
+.friend-item:active{background:var(--input-bg)}
+.fi-info{flex:1;min-width:0}
+.fi-name{font-size:16px;font-weight:500}
+.fi-status{font-size:12px;margin-top:2px;display:flex;align-items:center;gap:5px}
+.fi-status::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--txt3)}
+.fi-status.on{color:#3ec46d}
+.fi-status.on::before{background:#3ec46d}
+.fi-status.off{color:var(--txt3)}
+.friends-tip{flex:0 0 auto;font-size:12px;color:var(--txt3);text-align:center;padding:10px 20px calc(12px + env(safe-area-inset-bottom));line-height:1.7}
+
+/* SECTION: panel-me */
+.me-scroll{flex:1;min-height:0;overflow-y:auto;padding:16px 14px 30px}
+.me-card{
+  display:flex;align-items:center;gap:14px;background:var(--panel);
+  border-radius:var(--radius);padding:18px 16px;box-shadow:var(--shadow);
+}
+.me-avatar{width:56px;height:56px;border-radius:16px;font-size:19px}
+.me-name{font-size:18px;font-weight:600}
+.me-id{font-size:13px;color:var(--txt2);margin-top:3px}
+.me-group{background:var(--panel);border-radius:var(--radius);margin-top:14px;box-shadow:var(--shadow);overflow:hidden}
+.me-group-title{font-size:12px;color:var(--txt2);padding:12px 16px 6px}
+.me-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 16px;border-top:1px solid var(--line);font-size:15px;min-height:48px;
+}
+.me-row:first-of-type{border-top:none}
+.me-row .row-val{font-size:13px;color:var(--txt2)}
+.pwd-form{padding:6px 16px 16px}
+.pwd-form input{
+  width:100%;height:44px;background:var(--input-bg);border-radius:10px;
+  padding:0 12px;font-size:16px;margin-top:10px;
+}
+.pwd-form .btn-small{
+  width:100%;height:42px;margin-top:14px;border-radius:10px;
+  background:var(--brand);color:#fff;font-size:15px;font-weight:500;
+}
+.pwd-form .btn-small:active{background:var(--brand-deep)}
+.theme-seg{display:flex;gap:8px}
+.theme-seg button{
+  height:32px;padding:0 14px;border-radius:8px;font-size:13px;
+  background:var(--input-bg);color:var(--txt2);
+}
+.theme-seg button.on{background:var(--brand);color:#fff}
+.switch{width:46px;height:26px;border-radius:13px;background:var(--line);position:relative;flex:0 0 auto}
+.switch .dot{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch.off{opacity:.55}
+.me-logout{
+  width:100%;height:48px;border-radius:var(--radius);margin-top:14px;
+  background:var(--panel);color:#f25749;font-size:15px;box-shadow:var(--shadow);
+}
+.me-logout:active{background:var(--input-bg)}
+
+/* SECTION: tabbar */
+.tabbar{
+  flex:0 0 auto;display:flex;background:var(--panel);
+  border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 0 6px;color:var(--txt3);font-size:11px;min-height:56px;
+}
+.tab svg{width:24px;height:24px}
+.tab.on{color:var(--brand)}
+.tab span{line-height:1}
+
+/* SECTION: overlay */
+#ctx-menu{
+  position:fixed;z-index:60;background:var(--menu-bg);border-radius:12px;
+  box-shadow:0 6px 24px rgba(10,20,35,.22);padding:5px;min-width:112px;
+}
+.ctx-item{
+  display:block;width:100%;text-align:left;padding:10px 14px;
+  font-size:14px;border-radius:8px;color:var(--txt);
+}
+.ctx-item:active{background:var(--input-bg)}
+.ctx-item.danger{color:#f25749}
+#toast{
+  position:fixed;z-index:80;left:50%;top:14%;transform:translateX(-50%);
+  background:rgba(30,34,40,.92);color:#fff;font-size:14px;
+  padding:10px 18px;border-radius:24px;max-width:76vw;text-align:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+#toast.show{opacity:1}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- SECTION: screen-calc -->
+<section id="screen-calc" class="screen active">
+  <div class="app">
+    <header class="calc-head">
+      <h1>在线计算器</h1>
+      <p class="calc-sub">简洁四则 · 即开即用</p>
+    </header>
+    <div class="calc-card">
+      <div class="calc-display">
+        <div class="calc-expr" id="calc-expr">&nbsp;</div>
+        <div class="calc-out" id="calc-out">0</div>
+      </div>
+      <div class="calc-keys" id="calc-keys">
+        <button class="key fn" data-key="clear" aria-label="清除">C</button>
+        <button class="key fn" data-key="back" aria-label="退格">⌫</button>
+        <button class="key fn" data-key="percent">%</button>
+        <button class="key op" data-key="op" data-op="÷">÷</button>
+        <button class="key" data-key="digit" data-digit="7">7</button>
+        <button class="key" data-key="digit" data-digit="8">8</button>
+        <button class="key" data-key="digit" data-digit="9">9</button>
+        <button class="key op" data-key="op" data-op="×">×</button>
+        <button class="key" data-key="digit" data-digit="4">4</button>
+        <button class="key" data-key="digit" data-digit="5">5</button>
+        <button class="key" data-key="digit" data-digit="6">6</button>
+        <button class="key op" data-key="op" data-op="−">−</button>
+        <button class="key" data-key="digit" data-digit="1">1</button>
+        <button class="key" data-key="digit" data-digit="2">2</button>
+        <button class="key" data-key="digit" data-digit="3">3</button>
+        <button class="key op" data-key="op" data-op="+">+</button>
+        <button class="key zero" data-key="digit" data-digit="0">0</button>
+        <button class="key" data-key="dot">.</button>
+        <button class="key eq" data-key="equals">=</button>
+      </div>
+    </div>
+    <p class="calc-foot">计算结果仅供参考 · 在线计算器</p>
+  </div>
+</section>
+
+<!-- SECTION: screen-login -->
+<section id="screen-login" class="screen">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <rect x="9" y="4" width="30" height="40" rx="6" fill="#12b7f5"/>
+        <rect x="14" y="9" width="20" height="9" rx="2.5" fill="#fff"/>
+        <circle cx="17" cy="26" r="2.4" fill="#fff"/>
+        <circle cx="24" cy="26" r="2.4" fill="#fff"/>
+        <circle cx="31" cy="26" r="2.4" fill="#fff"/>
+        <circle cx="17" cy="35" r="2.4" fill="#fff"/>
+        <circle cx="24" cy="35" r="2.4" fill="#fff"/>
+        <rect x="28.4" y="32.4" width="5.2" height="5.2" rx="1.6" fill="#fff"/>
+      </svg>
+    </div>
+    <h2>在线计算器</h2>
+    <p class="login-sub">登录以保存你的个性化设置</p>
+    <div class="login-card">
+      <div class="field">
+        <label for="login-id">账号 ID</label>
+        <input id="login-id" inputmode="numeric" maxlength="8" placeholder="请输入管理员发放的账号 ID" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="login-pwd">密码</label>
+        <input id="login-pwd" type="password" maxlength="20" placeholder="请输入密码">
+      </div>
+      <div class="login-err" id="login-err"></div>
+      <button class="btn-primary" id="btn-login" data-primary-action>登 录</button>
+      <p class="login-tip">账号由管理员统一发放<br>首次登录后请在「我的」中修改初始密码</p>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION: screen-main -->
+<section id="screen-main" class="screen">
+  <div class="app main-app">
+    <header id="main-header"><h2 id="main-title">主客厅</h2></header>
+
+    <!-- SECTION: panel-chat -->
+    <div class="panel active" id="panel-chat">
+      <div class="conv-scroll" id="chat-list-view">
+        <div id="conv-list"></div>
+        <div class="empty" id="conv-empty">
+          <div class="empty-icon">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="opacity:.6"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.6 0-3.1-.4-4.4-1.2L3 20l1.3-4.6A8.5 8.5 0 1 1 21 11.5z"/></svg>
+          </div>
+          还没有会话<br>去 <b>昏光庭院</b> 添加好友，开始聊天吧
+        </div>
+      </div>
+      <div class="room-wrap" id="chat-room-view" hidden>
+        <div class="room-head">
+          <button class="room-back" id="room-back" aria-label="返回">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="room-title">
+            <div class="room-name" id="room-name"></div>
+            <div class="room-status on" id="room-status"></div>
+          </div>
+        </div>
+        <div class="msg-list" id="msg-list"></div>
+        <div id="edit-banner" hidden>
+          <span>正在编辑消息，发送后替换原内容</span>
+          <button id="edit-cancel">取消</button>
+        </div>
+        <div class="input-bar">
+          <input id="msg-input" maxlength="500" placeholder="输入消息…" autocomplete="off">
+          <button class="send-btn" id="btn-send" data-primary-action>发送</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION: panel-friends -->
+    <div class="panel" id="panel-friends">
+      <div class="add-bar">
+        <input id="add-id" inputmode="numeric" maxlength="8" placeholder="输入对方的账号 ID">
+        <button id="btn-add">加好友</button>
+      </div>
+      <div class="friend-scroll">
+        <div id="friend-list"></div>
+        <div class="empty" id="friend-empty">
+          <div class="empty-icon">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="opacity:.6"><path d="M3 21h18"/><path d="M6 21v-7a6 6 0 0 1 12 0v7"/></svg>
+          </div>
+          好友列表还是空的<br>在上方输入对方的账号 ID 即可添加
+        </div>
+      </div>
+      <p class="friends-tip">通过双方的账号 ID 建立好友关系 · 绿点表示对方当前在线</p>
+    </div>
+
+    <!-- SECTION: panel-me -->
+    <div class="panel" id="panel-me">
+      <div class="me-scroll">
+        <div class="me-card">
+          <div class="avatar me-avatar" id="me-avatar"></div>
+          <div>
+            <div class="me-name" id="me-name"></div>
+            <div class="me-id" id="me-id"></div>
+          </div>
+        </div>
+        <div class="me-group">
+          <div class="me-group-title">账号管理</div>
+          <div class="pwd-form">
+            <input id="pwd-old" type="password" maxlength="20" placeholder="当前密码">
+            <input id="pwd-new" type="password" maxlength="20" placeholder="新密码（至少 4 位）">
+            <input id="pwd-new2" type="password" maxlength="20" placeholder="再次输入新密码">
+            <button class="btn-small" id="btn-chpwd">修改密码</button>
+          </div>
+          <div class="me-row">
+            <span>消息通知</span>
+            <span style="display:flex;align-items:center;gap:8px">
+              <span class="row-val">已静音</span>
+              <span class="switch off" aria-disabled="true"><span class="dot"></span></span>
+            </span>
+          </div>
+        </div>
+        <div class="me-group">
+          <div class="me-group-title">设置</div>
+          <div class="me-row">
+            <span>主题</span>
+            <span class="theme-seg">
+              <button id="theme-light">浅色</button>
+              <button id="theme-dark">深色</button>
+            </span>
+          </div>
+          <div class="me-row" id="row-about" style="cursor:pointer">
+            <span>关于在线计算器</span>
+            <span class="row-val">v1.0.0</span>
+          </div>
+        </div>
+        <button class="me-logout" id="btn-logout">退出登录</button>
+      </div>
+    </div>
+
+    <!-- SECTION: tabbar -->
+    <nav class="tabbar">
+      <button class="tab on" data-tab="chat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.6 0-3.1-.4-4.4-1.2L3 20l1.3-4.6A8.5 8.5 0 1 1 21 11.5z"/><circle cx="8.8" cy="11.5" r=".9" fill="currentColor" stroke="none"/><circle cx="12.5" cy="11.5" r=".9" fill="currentColor" stroke="none"/><circle cx="16.2" cy="11.5" r=".9" fill="currentColor" stroke="none"/></svg>
+        <span>主客厅</span>
+      </button>
+      <button class="tab" data-tab="friends">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M6 21v-7a6 6 0 0 1 12 0v7"/><circle cx="18" cy="5" r="2.2"/></svg>
+        <span>昏光庭院</span>
+      </button>
+      <button class="tab" data-tab="me">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg>
+        <span>我的</span>
+      </button>
+    </nav>
+  </div>
+</section>
+
+<!-- SECTION: overlay -->
+<div id="ctx-menu" hidden></div>
+<div id="toast" role="status"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* SECTION: utils */
+function $(id){ return document.getElementById(id); }
+function now(){ return Date.now(); }
+function pad(n){ return n < 10 ? '0' + n : '' + n; }
+function fmtClock(ts){ var d = new Date(ts); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function fmtConvTime(ts){
+  var d = new Date(ts), t = new Date();
+  if(d.toDateString() === t.toDateString()) return fmtClock(ts);
+  if(d.getFullYear() === t.getFullYear()) return pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+}
+function fmtMsgTime(ts){
+  var d = new Date(ts), t = new Date();
+  if(d.toDateString() === t.toDateString()) return fmtClock(ts);
+  return pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + fmtClock(ts);
+}
+var toastTimer = null;
+function toast(msg){
+  var el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 1800);
+}
+function jget(k){ try{ var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; }catch(e){ return null; } }
+function jset(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+
+/* SECTION: store（本地模拟数据层，后续接 Supabase 时整体替换） */
+var LS = {
+  users:'oc_users', session:'oc_session', theme:'oc_theme',
+  friends:function(uid){ return 'oc_fr_' + uid; },
+  msgs:function(a,b){ return 'oc_pair_' + [a,b].sort().join('_'); }
+};
+var SEED = ['1001','1002','1003','1004','1005','1006','1007','1008','1009','1010'];
+function ensureSeed(){
+  if(jget(LS.users)) return;
+  var u = {};
+  SEED.forEach(function(id){ u[id] = { pwd:'1314' }; });
+  jset(LS.users, u);
+}
+function getUsers(){ return jget(LS.users) || {}; }
+function saveUsers(u){ jset(LS.users, u); }
+function getSession(){ return jget(LS.session); }
+function setSession(uid){ jset(LS.session, uid); }
+function clearSession(){ localStorage.removeItem(LS.session); }
+function getFriends(uid){ return jget(LS.friends(uid)) || []; }
+function saveFriends(uid,arr){ jset(LS.friends(uid), arr); }
+function getMsgs(a,b){ return jget(LS.msgs(a,b)) || []; }
+function saveMsgs(a,b,arr){ jset(LS.msgs(a,b), arr); }
+function isOnline(id){
+  var n = 0;
+  for(var i = 0; i < id.length; i++){ n = (n * 31 + id.charCodeAt(i)) >>> 0; }
+  return n % 97 < 55;
+}
+var AVATAR_COLORS = ['#12b7f5','#5f8bff','#ff9d4d','#f26d8a','#3ec46d','#9a7bff'];
+function avatarColor(id){
+  var n = 0;
+  for(var i = 0; i < id.length; i++){ n = (n * 17 + id.charCodeAt(i)) >>> 0; }
+  return AVATAR_COLORS[n % AVATAR_COLORS.length];
+}
+function avatarEl(id){
+  var a = document.createElement('div');
+  a.className = 'avatar';
+  a.style.background = avatarColor(id);
+  a.textContent = id.slice(-2);
+  return a;
+}
+
+/* SECTION: screens */
+function showScreen(name){
+  ['calc','login','main'].forEach(function(n){
+    $('screen-' + n).classList.toggle('active', n === name);
+  });
+  window.scrollTo(0,0);
+}
+
+/* SECTION: calc */
+var calc = { cur:'0', prev:null, op:null, fresh:true, err:false };
+function fmtNum(n){
+  if(!isFinite(n)) return '错误';
+  var s = String(parseFloat(n.toPrecision(12)));
+  if(s.length > 14) s = n.toExponential(6);
+  return s;
+}
+function renderCalc(){
+  var ex = (calc.op && calc.prev !== null) ? fmtNum(calc.prev) + ' ' + calc.op : '\u00A0';
+  $('calc-expr').textContent = ex;
+  $('calc-out').textContent = calc.cur;
+  $('calc-out').classList.toggle('small', calc.cur.length > 10);
+}
+function resetCalc(){ calc.cur = '0'; calc.prev = null; calc.op = null; calc.fresh = true; calc.err = false; renderCalc(); }
+function compute(a,b,op){
+  if(op === '+') return a + b;
+  if(op === '−') return a - b;
+  if(op === '×') return a * b;
+  if(op === '÷') return b === 0 ? null : a / b;
+  return null;
+}
+function digit(d){
+  if(calc.err) resetCalc();
+  if(calc.fresh){ calc.cur = (d === '.') ? '0.' : d; calc.fresh = false; }
+  else{
+    if(d === '.' && calc.cur.indexOf('.') >= 0) return;
+    if(calc.cur === '0' && d !== '.') calc.cur = d;
+    else{
+      if(calc.cur.length >= 15) return;
+      calc.cur += d;
+    }
+  }
+  renderCalc();
+}
+function chooseOp(op){
+  if(calc.err) return;
+  var v = parseFloat(calc.cur);
+  if(calc.prev !== null && calc.op && !calc.fresh){
+    var r = compute(calc.prev, v, calc.op);
+    if(r === null){ divZero(); return; }
+    calc.prev = r;
+    calc.cur = fmtNum(r);
+  }else if(calc.prev === null || calc.op === null){
+    calc.prev = v;
+  }
+  calc.op = op;
+  calc.fresh = true;
+  renderCalc();
+}
+function divZero(){
+  calc.cur = '除数不能为0';
+  calc.prev = null; calc.op = null; calc.fresh = true; calc.err = true;
+  renderCalc();
+}
+function equals(){
+  if(calc.err) return;
+  if(!calc.op && !calc.fresh && calc.cur === '1314'){ unlock(); return; }
+  if(calc.op && calc.prev !== null){
+    var v = parseFloat(calc.cur);
+    var r = compute(calc.prev, v, calc.op);
+    if(r === null){ divZero(); return; }
+    $('calc-expr').textContent = fmtNum(calc.prev) + ' ' + calc.op + ' ' + fmtNum(v) + ' =';
+    calc.cur = fmtNum(r);
+    calc.prev = null; calc.op = null; calc.fresh = true;
+    $('calc-out').textContent = calc.cur;
+    $('calc-out').classList.toggle('small', calc.cur.length > 10);
+    return;
+  }
+  calc.fresh = true;
+  renderCalc();
+}
+function back(){
+  if(calc.err){ resetCalc(); return; }
+  if(calc.fresh) return;
+  calc.cur = calc.cur.length > 1 ? calc.cur.slice(0,-1) : '0';
+  if(calc.cur === '') calc.cur = '0';
+  renderCalc();
+}
+function percent(){
+  if(calc.err) return;
+  calc.cur = fmtNum(parseFloat(calc.cur) / 100);
+  calc.fresh = false;
+  renderCalc();
+}
+function unlock(){
+  var sc = $('screen-calc');
+  sc.classList.add('unlocked');
+  setTimeout(function(){
+    sc.classList.remove('unlocked');
+    renderCalc();
+    var uid = getSession();
+    if(uid && getUsers()[uid]) openMain(uid);
+    else{
+      showScreen('login');
+      setTimeout(function(){ $('login-id').focus(); }, 80);
+    }
+  }, 420);
+}
+$('calc-keys').addEventListener('click', function(e){
+  var btn = e.target.closest('.key');
+  if(!btn) return;
+  var k = btn.dataset.key;
+  if(k === 'digit') digit(btn.dataset.digit);
+  else if(k === 'dot') digit('.');
+  else if(k === 'op') chooseOp(btn.dataset.op);
+  else if(k === 'equals') equals();
+  else if(k === 'clear') resetCalc();
+  else if(k === 'back') back();
+  else if(k === 'percent') percent();
+});
+document.addEventListener('keydown', function(e){
+  if(!$('screen-calc').classList.contains('active')) return;
+  var k = e.key;
+  if(k >= '0' && k <= '9') digit(k);
+  else if(k === '.') digit('.');
+  else if(k === '+') chooseOp('+');
+  else if(k === '-') chooseOp('−');
+  else if(k === '*' || k === 'x' || k === 'X') chooseOp('×');
+  else if(k === '/'){ e.preventDefault(); chooseOp('÷'); }
+  else if(k === 'Enter' || k === '='){ e.preventDefault(); equals(); }
+  else if(k === 'Backspace') back();
+  else if(k === 'Escape') resetCalc();
+  else if(k === '%') percent();
+});
+
+/* SECTION: login */
+$('btn-login').addEventListener('click', doLogin);
+$('login-pwd').addEventListener('keydown', function(e){ if(e.key === 'Enter') doLogin(); });
+function doLogin(){
+  var id = $('login-id').value.trim();
+  var pwd = $('login-pwd').value;
+  var err = $('login-err');
+  if(!/^\d{4,8}$/.test(id)){ err.textContent = '请输入 4–8 位数字账号 ID'; return; }
+  if(!pwd){ err.textContent = '请输入密码'; return; }
+  var users = getUsers();
+  if(!users[id] || users[id].pwd !== pwd){
+    err.textContent = '账号 ID 或密码不正确，请核对后重试';
+    return;
+  }
+  err.textContent = '';
+  $('login-pwd').value = '';
+  setSession(id);
+  openMain(id);
+}
+
+/* SECTION: main */
+var ME = null, CUR_FRIEND = null, EDIT_ID = null, lastTouchOpen = 0;
+var TAB_TITLES = { chat:'主客厅', friends:'昏光庭院', me:'我的' };
+
+function openMain(uid){
+  ME = uid;
+  showScreen('main');
+  $('me-name').textContent = '同学 ' + ME;
+  $('me-id').textContent = 'ID：' + ME;
+  var av = $('me-avatar');
+  av.textContent = ME.slice(-2);
+  av.style.background = avatarColor(ME);
+  showTab('chat');
+}
+function showTab(t){
+  document.querySelectorAll('.tab').forEach(function(b){
+    b.classList.toggle('on', b.dataset.tab === t);
+  });
+  ['chat','friends','me'].forEach(function(n){
+    $('panel-' + n).classList.toggle('active', n === t);
+  });
+  $('main-title').textContent = TAB_TITLES[t];
+  if(t === 'chat'){ closeChat(true); renderConvs(); }
+  if(t === 'friends') renderFriends();
+}
+document.querySelectorAll('.tab').forEach(function(b){
+  b.addEventListener('click', function(){ showTab(b.dataset.tab); });
+});
+
+/* SECTION: conv-list */
+function renderConvs(){
+  var list = $('conv-list');
+  list.textContent = '';
+  var friends = getFriends(ME);
+  var convs = [];
+  friends.forEach(function(fid){
+    var msgs = getMsgs(ME, fid);
+    if(msgs.length) convs.push({ fid:fid, last:msgs[msgs.length-1] });
+  });
+  convs.sort(function(a,b){ return b.last.ts - a.last.ts; });
+  $('conv-empty').style.display = convs.length ? 'none' : '';
+  convs.forEach(function(c){ list.appendChild(convItem(c)); });
+}
+function convItem(c){
+  var el = document.createElement('div');
+  el.className = 'conv-item';
+  el.appendChild(avatarEl(c.fid));
+  var info = document.createElement('div');
+  info.className = 'conv-info';
+  var top = document.createElement('div');
+  top.className = 'conv-top';
+  var nm = document.createElement('div');
+  nm.className = 'conv-name';
+  nm.textContent = '同学 ' + c.fid;
+  var tm = document.createElement('div');
+  tm.className = 'conv-time';
+  tm.textContent = fmtConvTime(c.last.ts);
+  top.appendChild(nm); top.appendChild(tm);
+  var pv = document.createElement('div');
+  pv.className = 'conv-preview';
+  pv.textContent = c.last.recalled ? '[撤回消息]' : c.last.text;
+  info.appendChild(top); info.appendChild(pv);
+  el.appendChild(info);
+  el.addEventListener('click', function(){ openChat(c.fid); });
+  return el;
+}
+
+/* SECTION: chat-room */
+function openChat(fid){
+  CUR_FRIEND = fid;
+  EDIT_ID = null;
+  $('edit-banner').hidden = true;
+  $('chat-list-view').hidden = true;
+  $('chat-room-view').hidden = false;
+  $('room-name').textContent = '同学 ' + fid;
+  var st = $('room-status');
+  var on = isOnline(fid);
+  st.textContent = on ? '在线' : '离线';
+  st.className = 'room-status ' + (on ? 'on' : 'off');
+  $('msg-input').value = '';
+  renderMsgs();
+}
+function closeChat(silent){
+  CUR_FRIEND = null;
+  EDIT_ID = null;
+  $('edit-banner').hidden = true;
+  $('chat-room-view').hidden = true;
+  $('chat-list-view').hidden = false;
+  if(!silent) renderConvs();
+}
+$('room-back').addEventListener('click', function(){ closeChat(false); });
+
+function renderMsgs(){
+  var box = $('msg-list');
+  box.textContent = '';
+  var msgs = getMsgs(ME, CUR_FRIEND);
+  var lastTs = 0;
+  msgs.forEach(function(m){
+    if(m.ts - lastTs > 5 * 60 * 1000){
+      var t = document.createElement('div');
+      t.className = 'time-label';
+      var s = document.createElement('span');
+      s.textContent = fmtMsgTime(m.ts);
+      t.appendChild(s);
+      box.appendChild(t);
+    }
+    lastTs = m.ts;
+    box.appendChild(buildMsg(m));
+  });
+  box.scrollTop = box.scrollHeight;
+}
+function buildMsg(m){
+  if(m.recalled){
+    var s = document.createElement('div');
+    s.className = 'sys-msg';
+    s.textContent = m.from === ME ? '你撤回了一条消息' : '对方撤回了一条消息';
+    return s;
+  }
+  var wrap = document.createElement('div');
+  wrap.className = 'msg ' + (m.from === ME ? 'self' : 'other');
+  var b = document.createElement('div');
+  b.className = 'bubble';
+  b.textContent = m.text;
+  if(m.edited){
+    var em = document.createElement('span');
+    em.className = 'edited';
+    em.textContent = '已编辑';
+    b.appendChild(em);
+  }
+  wrap.appendChild(b);
+  attachMsgGesture(wrap, m);
+  return wrap;
+}
+function attachMsgGesture(el, m){
+  el.addEventListener('contextmenu', function(e){
+    e.preventDefault();
+    if(now() - lastTouchOpen < 800) return;
+    openCtx(e.clientX, e.clientY, m);
+  });
+  var timer = null;
+  el.addEventListener('touchstart', function(e){
+    var t = e.touches[0];
+    timer = setTimeout(function(){
+      lastTouchOpen = now();
+      openCtx(t.clientX, t.clientY, m);
+    }, 460);
+  }, { passive:true });
+  el.addEventListener('touchmove', function(){ clearTimeout(timer); }, { passive:true });
+  el.addEventListener('touchend', function(){ clearTimeout(timer); });
+  el.addEventListener('touchcancel', function(){ clearTimeout(timer); });
+}
+
+/* SECTION: ctx-menu */
+function openCtx(x, y, m){
+  var menu = $('ctx-menu');
+  menu.textContent = '';
+  var items = [];
+  var mine = m.from === ME && !m.recalled;
+  if(mine){
+    items.push({ t:'编辑', fn:function(){ startEdit(m); } });
+    if(now() - m.ts <= 2 * 60 * 1000){
+      items.push({ t:'撤回', fn:function(){ doRecall(m); } });
+    }
+  }
+  if(!m.recalled){
+    items.push({ t:'复制', fn:function(){ copyText(m.text); } });
+  }
+  items.push({ t:'删除', danger:true, fn:function(){ doDelete(m); } });
+  items.forEach(function(it){
+    var b = document.createElement('button');
+    b.className = 'ctx-item' + (it.danger ? ' danger' : '');
+    b.textContent = it.t;
+    b.addEventListener('click', function(){ hideCtx(); it.fn(); });
+    menu.appendChild(b);
+  });
+  menu.hidden = false;
+  var mw = menu.offsetWidth, mh = menu.offsetHeight;
+  menu.style.left = Math.max(8, Math.min(x, window.innerWidth - mw - 8)) + 'px';
+  menu.style.top = Math.max(8, Math.min(y, window.innerHeight - mh - 8)) + 'px';
+}
+function hideCtx(){ $('ctx-menu').hidden = true; }
+document.addEventListener('click', function(e){
+  if(!$('ctx-menu').hidden && !e.target.closest('#ctx-menu')) hideCtx();
+});
+window.addEventListener('scroll', hideCtx, true);
+
+function updateMsg(mid, fn){
+  var msgs = getMsgs(ME, CUR_FRIEND);
+  msgs.forEach(function(m){ if(m.id === mid) fn(m); });
+  saveMsgs(ME, CUR_FRIEND, msgs);
+  renderMsgs();
+}
+function doRecall(m){
+  updateMsg(m.id, function(x){ x.recalled = true; });
+  toast('已撤回');
+}
+function doDelete(m){
+  var msgs = getMsgs(ME, CUR_FRIEND).filter(function(x){ return x.id !== m.id; });
+  saveMsgs(ME, CUR_FRIEND, msgs);
+  renderMsgs();
+  toast('已删除');
+}
+function copyText(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(
+      function(){ toast('已复制'); },
+      function(){ fallbackCopy(text); }
+    );
+  }else fallbackCopy(text);
+}
+function fallbackCopy(text){
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand('copy'); toast('已复制'); }
+  catch(e){ toast('复制失败，请长按手动复制'); }
+  document.body.removeChild(ta);
+}
+function startEdit(m){
+  EDIT_ID = m.id;
+  $('edit-banner').hidden = false;
+  var inp = $('msg-input');
+  inp.value = m.text;
+  inp.focus();
+}
+$('edit-cancel').addEventListener('click', function(){
+  EDIT_ID = null;
+  $('edit-banner').hidden = true;
+  $('msg-input').value = '';
+});
+
+/* SECTION: send */
+function sendMsg(){
+  var inp = $('msg-input');
+  var text = inp.value.trim();
+  if(!text || !CUR_FRIEND) return;
+  var msgs = getMsgs(ME, CUR_FRIEND);
+  if(EDIT_ID){
+    msgs.forEach(function(m){
+      if(m.id === EDIT_ID){ m.text = text; m.edited = true; }
+    });
+    EDIT_ID = null;
+    $('edit-banner').hidden = true;
+  }else{
+    msgs.push({
+      id:'m' + now() + Math.floor(Math.random() * 1000),
+      from:ME, text:text, ts:now(), edited:false, recalled:false
+    });
+  }
+  saveMsgs(ME, CUR_FRIEND, msgs);
+  inp.value = '';
+  renderMsgs();
+}
+$('btn-send').addEventListener('click', sendMsg);
+$('msg-input').addEventListener('keydown', function(e){
+  if(e.key === 'Enter'){ e.preventDefault(); sendMsg(); }
+});
+
+/* SECTION: friends */
+function renderFriends(){
+  var list = $('friend-list');
+  list.textContent = '';
+  var friends = getFriends(ME);
+  $('friend-empty').style.display = friends.length ? 'none' : '';
+  friends.forEach(function(fid){ list.appendChild(friendItem(fid)); });
+}
+function friendItem(fid){
+  var el = document.createElement('div');
+  el.className = 'friend-item';
+  el.appendChild(avatarEl(fid));
+  var info = document.createElement('div');
+  info.className = 'fi-info';
+  var nm = document.createElement('div');
+  nm.className = 'fi-name';
+  nm.textContent = '同学 ' + fid;
+  var st = document.createElement('div');
+  var on = isOnline(fid);
+  st.className = 'fi-status ' + (on ? 'on' : 'off');
+  st.textContent = on ? '在线' : '离线';
+  info.appendChild(nm); info.appendChild(st);
+  el.appendChild(info);
+  el.addEventListener('click', function(){
+    showTab('chat');
+    openChat(fid);
+  });
+  return el;
+}
+$('btn-add').addEventListener('click', addFriend);
+$('add-id').addEventListener('keydown', function(e){ if(e.key === 'Enter') addFriend(); });
+function addFriend(){
+  var inp = $('add-id');
+  var id = inp.value.trim();
+  if(!/^\d{4,8}$/.test(id)){ toast('请输入 4–8 位数字账号 ID'); return; }
+  if(id === ME){ toast('不能添加自己为好友'); return; }
+  if(!getUsers()[id]){ toast('该账号不存在，请核对 ID'); return; }
+  var friends = getFriends(ME);
+  if(friends.indexOf(id) >= 0){ toast('你们已经是好友了'); inp.value = ''; return; }
+  friends.push(id);
+  saveFriends(ME, friends);
+  inp.value = '';
+  renderFriends();
+  toast('已添加 同学 ' + id);
+}
+
+/* SECTION: me */
+$('btn-chpwd').addEventListener('click', function(){
+  var old = $('pwd-old').value;
+  var nw = $('pwd-new').value;
+  var nw2 = $('pwd-new2').value;
+  var users = getUsers();
+  if(users[ME].pwd !== old){ toast('当前密码不正确'); return; }
+  if(nw.length < 4){ toast('新密码至少 4 位'); return; }
+  if(nw !== nw2){ toast('两次输入的新密码不一致'); return; }
+  users[ME].pwd = nw;
+  saveUsers(users);
+  $('pwd-old').value = '';
+  $('pwd-new').value = '';
+  $('pwd-new2').value = '';
+  toast('密码修改成功，请牢记新密码');
+});
+$('btn-logout').addEventListener('click', function(){
+  clearSession();
+  ME = null;
+  $('login-id').value = '';
+  $('login-pwd').value = '';
+  showScreen('login');
+  toast('已退出登录');
+});
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  jset(LS.theme, t);
+  $('theme-light').classList.toggle('on', t === 'light');
+  $('theme-dark').classList.toggle('on', t === 'dark');
+}
+$('theme-light').addEventListener('click', function(){ applyTheme('light'); });
+$('theme-dark').addEventListener('click', function(){ applyTheme('dark'); });
+$('row-about').addEventListener('click', function(){
+  toast('在线计算器 v1.0.0 · 简洁好用的计算工具');
+});
+
+/* SECTION: init */
+ensureSeed();
+applyTheme(jget(LS.theme) || 'light');
+renderCalc();
+showScreen('calc');
+})();
+</script>
+</body>
+</html>
