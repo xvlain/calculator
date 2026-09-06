@@ -94,8 +94,9 @@ input,select,textarea{font-family:inherit;outline:none;border:none;background:no
 .main-app{height:100%;height:100dvh;overflow:hidden}
 #main-header{flex:0 0 auto;height:52px;display:flex;align-items:center;justify-content:center;background:var(--panel);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
 #main-header h2{font-size:17px;font-weight:600}
-.panel{display:none;flex:1;min-height:0;flex-direction:column;background:var(--app-bg);overflow:hidden}
-.panel.active{display:flex}
+.panel{display:none;flex:1;min-height:0;flex-direction:column;background:var(--app-bg);overflow:hidden;position:relative}
+.panel.active{display:flex;animation:panelIn .25s ease-out both}
+@keyframes panelIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 /* ===== 会话列表 ===== */
 .conv-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
@@ -249,6 +250,9 @@ html[data-theme="dark"] .btn-block{background:#3b1c1c;color:#f87171;border-color
 .ep-gender-group{display:flex;gap:10px}
 .ep-gender-group button{flex:1;height:44px;border-radius:10px;font-size:14px;font-weight:500;background:var(--input-bg);color:var(--txt2);border:1.5px solid transparent;transition:all .15s}
 .ep-gender-group button.on{background:var(--brand-soft);color:var(--brand-deep);border-color:var(--brand)}
+.ep-textarea{width:100%;min-height:70px;background:var(--input-bg);border-radius:10px;padding:12px 14px;font-size:14px;border:1.5px solid transparent;transition:border-color .15s;resize:none;line-height:1.5;font-family:inherit}
+.ep-textarea:focus{border-color:var(--brand)}
+.ep-hint{font-size:12px;color:var(--txt3);margin-top:4px}
 
 /* ===== 备注弹窗 ===== */
 .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:70;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center}
@@ -263,12 +267,14 @@ html[data-theme="dark"] .btn-block{background:#3b1c1c;color:#f87171;border-color
 .modal-confirm{background:var(--brand);color:#fff}
 
 /* ===== Tabbar ===== */
-.tabbar{flex:0 0 auto;display:flex;background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 6px;color:var(--txt3);font-size:11px;min-height:56px}
+.tabbar{flex:0 0 auto;display:flex;background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);transition:transform .25s ease,opacity .25s ease}
+.tabbar.hidden{transform:translateY(100%);opacity:0;pointer-events:none;height:0;min-height:0;padding:0;overflow:hidden;border:none}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 6px;color:var(--txt3);font-size:11px;min-height:56px;position:relative}
 .tab svg{width:24px;height:24px}
 .tab.on{color:var(--brand)}
 .tab span{line-height:1}
-.tab-badge{position:absolute;top:4px;right:50%;transform:translateX(16px);min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#ef4444;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.tab-badge{position:absolute;top:2px;right:calc(50% - 20px);min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#ef4444;color:#fff;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;line-height:1}
+.tab-badge.show{display:flex}
 
 /* ===== 上下文菜单 ===== */
 #ctx-menu{position:fixed;z-index:60;background:var(--menu-bg);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:5px;min-width:110px}
@@ -357,12 +363,12 @@ html[data-theme="dark"] .btn-block{background:#3b1c1c;color:#f87171;border-color
 <div class="me-row"><span>主题</span><span class="theme-seg"><button id="theme-light">浅色</button><button id="theme-dark">深色</button></span></div>
 <div class="me-row"><span>好友验证</span><span class="switch off" id="switch-approval"><span class="dot"></span></span></div>
 <div class="me-row"><span>消息通知</span><span style="display:flex;align-items:center;gap:8px"><span class="row-val">已静音</span><span class="switch off disabled" aria-disabled="true"><span class="dot"></span></span></span></div>
-<div class="me-row" id="row-about"><span>关于在线计算器</span><span class="row-val">v1.3.0</span></div>
+<div class="me-row" id="row-about"><span>关于在线计算器</span><span class="row-val">v1.6.0</span></div>
 </div>
 <button class="me-logout" id="btn-logout">退出登录</button>
 </div></div>
 <nav class="tabbar">
-<button class="tab on" data-tab="chat" style="position:relative"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.6 0-3.1-.4-4.4-1.2L3 20l1.3-4.6A8.5 8.5 0 1 1 21 11.5z"/><circle cx="8.8" cy="11.5" r=".9" fill="currentColor" stroke="none"/><circle cx="12.5" cy="11.5" r=".9" fill="currentColor" stroke="none"/><circle cx="16.2" cy="11.5" r=".9" fill="currentColor" stroke="none"/></svg><span>主客厅</span></button>
+<button class="tab on" data-tab="chat" style="position:relative"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.6 0-3.1-.4-4.4-1.2L3 20l1.3-4.6A8.5 8.5 0 1 1 21 11.5z"/><circle cx="8.8" cy="11.5" r=".9" fill="currentColor" stroke="none"/><circle cx="12.5" cy="11.5" r=".9" fill="currentColor" stroke="none"/><circle cx="16.2" cy="11.5" r=".9" fill="currentColor" stroke="none"/></svg><span>主客厅</span><span class="tab-badge" id="chat-badge"></span></button>
 <button class="tab" data-tab="friends" style="position:relative"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M6 21v-7a6 6 0 0 1 12 0v7"/><circle cx="18" cy="5" r="2.2"/></svg><span>昏光庭院</span><span class="tab-badge" id="friends-badge" style="display:none"></span></button>
 <button class="tab" data-tab="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></svg><span>我的</span></button>
 </nav>
@@ -385,6 +391,7 @@ html[data-theme="dark"] .btn-block{background:#3b1c1c;color:#f87171;border-color
 <div class="ep-field"><label for="ep-nickname">昵称</label><input id="ep-nickname" maxlength="20" placeholder="最多 20 个字"></div>
 <div class="ep-field"><label for="ep-birthday">生日</label><input id="ep-birthday" type="date"></div>
 <div class="ep-field"><label>性别</label><div class="ep-gender-group"><button data-gender="男">男</button><button data-gender="女">女</button><button data-gender="">保密</button></div></div>
+<div class="ep-field"><label for="ep-greeting">见面语</label><textarea id="ep-greeting" class="ep-textarea" maxlength="100" placeholder="加好友后自动发送给对方的问候语"></textarea><div class="ep-hint">添加好友成功后会自动互相发送，最多 100 字</div></div>
 </div></div>
 
 <div class="edit-profile-overlay" id="pwd-overlay">
@@ -447,7 +454,7 @@ function setSession(s){jset('oc_session',s);}
 function clearSession(){localStorage.removeItem('oc_session');}
 function checkSessionExpiry(){var s=getSession();if(!s)return false;var la=s.last_active||s.login_time;if(!la)return true;if(now()-la>14*24*60*60*1000){clearSession();return false;}s.last_active=now();setSession(s);return true;}
 
-var ME=null,TOKEN=null,MY_PROFILE=null,FRIENDS=[],BLOCKS=[],MSG={},MAX_ID=0,CUR_FRIEND=null,EDIT_ID=null,RECALL_CONTENT=null,ONLINE={},HEART_TIMER=null,POLL_TIMER=null,netCh=null,lobbyCh=null,POLLING=false,lastTouchOpen=0;
+var ME=null,TOKEN=null,MY_PROFILE=null,FRIENDS=[],BLOCKS=[],MSG={},MAX_ID=0,CUR_FRIEND=null,EDIT_ID=null,RECALL_CONTENT=null,ONLINE={},HEART_TIMER=null,POLL_TIMER=null,netCh=null,lobbyCh=null,POLLING=false,lastTouchOpen=0,UNREAD={},DEFAULT_GREETING='很高兴认识你，请多指教。';
 function convKey(a,b){return[a,b].sort().join('|');}
 function peerOf(conv){var p=conv.split('|');return p[0]===ME?p[1]:p[0];}
 function tsOf(m){return new Date(m.created_at).getTime();}
@@ -476,14 +483,15 @@ $('btn-login').addEventListener('click',doLogin);
 $('login-pwd').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
 function doLogin(){var id=$('login-id').value.trim(),pwd=$('login-pwd').value,err=$('login-err');if(!/^\d{4,16}$/.test(id)){err.textContent='请输入 4–16 位数字账号 ID';return;}if(!pwd){err.textContent='请输入密码';return;}var btn=$('btn-login');btn.disabled=true;btn.textContent='登录中…';rpc('calc_login',{p_id:id,p_pwd:pwd}).then(function(d){btn.disabled=false;btn.textContent='登 录';if(!d.ok){err.textContent=d.error||'登录失败';return;}err.textContent='';$('login-pwd').value='';setSession({uid:id,token:d.token,login_time:now(),last_active:now()});openMain(id);}).catch(function(e){btn.disabled=false;btn.textContent='登 录';err.textContent=e.message;});}
 
-function openMain(uid){var s=getSession();ME=uid;TOKEN=s?s.token:null;MSG={};MAX_ID=0;FRIENDS=[];ONLINE={};BLOCKS=[];showScreen('main');showTab('chat');bootData();}
+function openMain(uid){var s=getSession();ME=uid;TOKEN=s?s.token:null;MSG={};MAX_ID=0;FRIENDS=[];ONLINE={};BLOCKS=[];UNREAD={};showScreen('main');showTab('chat');$('chat-room-view').hidden=true;$('chat-list-view').hidden=false;$('edit-banner').hidden=true;bootData();}
 function bootData(){renderConvs();renderFriends();rpc('calc_heartbeat',{p_token:TOKEN}).catch(function(){});loadProfile().then(function(){renderMe();loadFriends();loadBlocks();poll(0);startEngine();});}
 function loadProfile(){return rpc('calc_get_profile',{p_token:TOKEN,p_target_id:ME}).then(function(d){if(!d.ok){handleRpcErr(d.error);return;}MY_PROFILE=d.profile;}).catch(function(e){if(!/本地预览/.test(e.message))console.warn('profile:',e.message);});}
 function loadBlocks(){return rpc('calc_get_blocks',{p_token:TOKEN}).then(function(d){if(d.ok)BLOCKS=d.blocks||[];$('block-count').textContent=BLOCKS.length+' 人';}).catch(function(){});}
 function renderMe(){if(!MY_PROFILE)return;$('me-name').textContent=MY_PROFILE.nickname||'同学 '+ME;$('me-id').textContent='ID：'+ME;var av=$('me-avatar');av.innerHTML='';if(MY_PROFILE.avatar){var img=document.createElement('img');img.src=MY_PROFILE.avatar;av.appendChild(img);}else{av.textContent=ME.slice(-2);av.style.background=avatarColor(ME);}var sw=$('switch-approval');if(MY_PROFILE.require_approval)sw.classList.add('on');else sw.classList.remove('on');}
 function forceRelogin(msg){stopEngine();clearSession();ME=null;TOKEN=null;MY_PROFILE=null;MSG={};MAX_ID=0;FRIENDS=[];ONLINE={};CUR_FRIEND=null;EDIT_ID=null;showScreen('login');toast(msg||'登录已过期，请重新登录');}
 function handleRpcErr(text){if(text&&text.indexOf('会话失效')>=0)forceRelogin();else toast(text||'操作失败');}
-function showTab(t){document.querySelectorAll('.tab').forEach(function(b){b.classList.toggle('on',b.dataset.tab===t);});['chat','friends','me'].forEach(function(n){$('panel-'+n).classList.toggle('active',n===t);});$('main-title').textContent=TAB_TITLES[t];if(t==='chat'){closeChat(true);renderConvs();}if(t==='friends'){renderFriends();loadPendingRequests();}}
+function showTab(t){document.querySelectorAll('.tab').forEach(function(b){b.classList.toggle('on',b.dataset.tab===t);});['chat','friends','me'].forEach(function(n){$('panel-'+n).classList.toggle('active',n===t);});$('main-title').textContent=TAB_TITLES[t];document.querySelector('.tabbar').classList.remove('hidden');if(t==='chat'){closeChat(true);renderConvs();updateBadge();}if(t==='friends'){renderFriends();loadPendingRequests();}}
+function updateBadge(){var total=0;Object.keys(UNREAD).forEach(function(k){total+=(UNREAD[k]||0);});var badge=document.getElementById('chat-badge');if(badge){if(total>0){badge.textContent=total>99?'99+':total;badge.classList.add('show');}else{badge.classList.remove('show');}}}
 document.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){showTab(b.dataset.tab);});});
 
 function upsertMsg(m){var arr=MSG[m.conv]||(MSG[m.conv]=[]);var idx=-1;for(var i=0;i<arr.length;i++)if(Number(arr[i].id)===Number(m.id)){idx=i;break;}if(idx>=0)arr[idx]=m;else arr.push(m);arr.sort(function(a,b){return Number(a.id)-Number(b.id);});if(Number(m.id)>MAX_ID)MAX_ID=Number(m.id);}
@@ -528,10 +536,11 @@ function compressImage(file, maxWidth, quality){
     reader.readAsDataURL(file);
   });
 }
-function poll(afterId){if(!ME||!TOKEN||POLLING)return Promise.resolve();POLLING=true;return rpc('calc_poll',{p_token:TOKEN,p_after_id:afterId}).then(function(d){POLLING=false;if(!d.ok){handleRpcErr(d.error);return;}var touched={};(d.msgs||[]).forEach(function(m){upsertMsg(m);touched[m.conv]=true;});if(Object.keys(touched).length){renderConvs();if(CUR_FRIEND&&touched[convKey(ME,CUR_FRIEND)])renderMsgs();}}).catch(function(e){POLLING=false;});}
+function poll(afterId){if(!ME||!TOKEN||POLLING)return Promise.resolve();POLLING=true;return rpc('calc_poll',{p_token:TOKEN,p_after_id:afterId}).then(function(d){POLLING=false;if(!d.ok){handleRpcErr(d.error);return;}var touched={};(d.msgs||[]).forEach(function(m){upsertMsg(m);touched[m.conv]=true;if(m.sender!==ME&&m.conv!==convKey(ME,CUR_FRIEND)){var peer=peerOf(m.conv);UNREAD[peer]=(UNREAD[peer]||0)+1;}});if(Object.keys(touched).length){renderConvs();updateBadge();if(CUR_FRIEND&&touched[convKey(ME,CUR_FRIEND)])renderMsgs();}}).catch(function(e){POLLING=false;});}
 function loadFriends(){if(!ME||!TOKEN)return Promise.resolve();return rpc('calc_list_friends',{p_token:TOKEN}).then(function(d){if(!d.ok){handleRpcErr(d.error);return;}FRIENDS=d.friends||[];if($('panel-friends').classList.contains('active'))renderFriends();renderRoomStatus();}).catch(function(){});}
 function loadPendingRequests(){return rpc('calc_get_pending_requests',{p_token:TOKEN}).then(function(d){if(!d.ok)return;var reqs=d.requests||[];var sec=$('pending-section');var list=$('pending-list');list.textContent='';if(reqs.length){sec.style.display='';reqs.forEach(function(r){var el=document.createElement('div');el.className='pending-item';el.appendChild(avatarEl(r.from_id,r.avatar));var info=document.createElement('div');info.className='pending-info';var nm=document.createElement('div');nm.className='pending-name';nm.textContent=(r.nickname||'同学 '+r.from_id)+' 请求添加你为好友';info.appendChild(nm);el.appendChild(info);var btns=document.createElement('div');btns.className='pending-btns';var btnA=document.createElement('button');btnA.className='btn-accept';btnA.textContent='同意';btnA.addEventListener('click',function(){handleFriendRequest(r.id,true,el);});var btnR=document.createElement('button');btnR.className='btn-reject';btnR.textContent='拒绝';btnR.addEventListener('click',function(){handleFriendRequest(r.id,false,el);});btns.appendChild(btnA);btns.appendChild(btnR);el.appendChild(btns);list.appendChild(el);});$('friends-badge').textContent=reqs.length;$('friends-badge').style.display='';}else{sec.style.display='none';$('friends-badge').style.display='none';}}).catch(function(){});}
-function handleFriendRequest(reqId,accept,el){rpc('calc_handle_friend_request',{p_token:TOKEN,p_request_id:reqId,p_accept:accept}).then(function(d){if(!d.ok){toast(d.error);return;}el.remove();toast(accept?'已添加为好友':'已拒绝');loadFriends().then(function(){renderFriends();});if(accept)notifyTo(d.from_id,'friend');}).catch(function(e){toast(e.message);});}
+function handleFriendRequest(reqId,accept,el){rpc('calc_handle_friend_request',{p_token:TOKEN,p_request_id:reqId,p_accept:accept}).then(function(d){if(!d.ok){toast(d.error);return;}el.remove();toast(accept?'已添加为好友':'已拒绝');loadFriends().then(function(){renderFriends();});if(accept){sendGreeting(d.from_id);notifyTo(d.from_id,'friend');}}).catch(function(e){toast(e.message);});}
+function sendGreeting(uid){var greeting=(MY_PROFILE&&MY_PROFILE.greeting)||DEFAULT_GREETING;if(!greeting)return;rpc('calc_send_msg',{p_token:TOKEN,p_to:uid,p_content:greeting,p_msg_type:'text'}).then(function(d){if(d.ok&&d.msg){upsertMsg(d.msg);renderConvs();notifyTo(uid,'refresh');}}).catch(function(){});}
 
 function startEngine(){stopEngine();if(!sb)return;HEART_TIMER=setInterval(function(){rpc('calc_heartbeat',{p_token:TOKEN}).catch(function(){});},30000);POLL_TIMER=setInterval(function(){poll(MAX_ID);},15000);netCh=sb.channel('calc-net');netCh.on('broadcast',{event:'msg'},function(payload){var p=payload||{};if(p.to!==ME)return;if(p.event==='friend'){loadFriends();loadPendingRequests();}else poll(MAX_ID);}).subscribe();lobbyCh=sb.channel('lobby',{config:{presence:{key:ME}}});lobbyCh.on('presence',{event:'sync'},syncPresence).on('presence',{event:'join'},syncPresence).on('presence',{event:'leave'},syncPresence).subscribe(function(status){if(status==='SUBSCRIBED'&&lobbyCh)lobbyCh.track();});}
 function stopEngine(){if(HEART_TIMER){clearInterval(HEART_TIMER);HEART_TIMER=null;}if(POLL_TIMER){clearInterval(POLL_TIMER);POLL_TIMER=null;}if(netCh&&sb){sb.removeChannel(netCh);netCh=null;}if(lobbyCh&&sb){sb.removeChannel(lobbyCh);lobbyCh=null;}}
@@ -550,9 +559,9 @@ function displayName(fid){var f=getFriendInfo(fid);if(f&&f.note)return f.note;if
 function renderConvs(){var list=$('conv-list');list.textContent='';var convs=[];Object.keys(MSG).forEach(function(conv){var msgs=MSG[conv];if(!msgs.length)return;convs.push({conv:conv,peer:peerOf(conv),last:msgs[msgs.length-1]});});convs.sort(function(x,y){return Number(y.last.id)-Number(x.last.id);});$('conv-empty').style.display=convs.length?'none':'';convs.forEach(function(c){list.appendChild(convItem(c));});}
 function convItem(c){var el=document.createElement('div');el.className='conv-item';var f=getFriendInfo(c.peer);el.appendChild(avatarEl(c.peer,f&&f.avatar));var info=document.createElement('div');info.className='conv-info';var top=document.createElement('div');top.className='conv-top';var nm=document.createElement('div');nm.className='conv-name';nm.textContent=displayName(c.peer);var tm=document.createElement('div');tm.className='conv-time';tm.textContent=fmtConvTime(tsOf(c.last));top.appendChild(nm);top.appendChild(tm);var pv=document.createElement('div');pv.className='conv-preview';pv.textContent=c.last.recalled?'[撤回消息]':c.last.content;info.appendChild(top);info.appendChild(pv);el.appendChild(info);el.addEventListener('click',function(){openChat(c.peer);});return el;}
 
-function openChat(fid){CUR_FRIEND=fid;EDIT_ID=null;RECALL_CONTENT=null;$('edit-banner').hidden=true;$('chat-list-view').hidden=true;$('chat-room-view').hidden=false;$('room-name').textContent=displayName(fid);renderRoomStatus();$('msg-input').value='';renderMsgs();}
+function openChat(fid){CUR_FRIEND=fid;EDIT_ID=null;RECALL_CONTENT=null;$('edit-banner').hidden=true;$('chat-list-view').hidden=true;$('chat-room-view').hidden=false;$('room-name').textContent=displayName(fid);document.querySelector('.tabbar').classList.add('hidden');UNREAD[fid]=0;updateBadge();renderRoomStatus();$('msg-input').value='';renderMsgs();}
 function renderRoomStatus(){if(!CUR_FRIEND)return;var st=$('room-status');var on=friendOnline(CUR_FRIEND);st.textContent=on?'在线':'离线';st.className='room-status '+(on?'on':'off');}
-function closeChat(silent){CUR_FRIEND=null;EDIT_ID=null;RECALL_CONTENT=null;$('edit-banner').hidden=true;$('chat-room-view').hidden=true;$('chat-list-view').hidden=false;if(!silent)renderConvs();}
+function closeChat(silent){CUR_FRIEND=null;EDIT_ID=null;RECALL_CONTENT=null;$('edit-banner').hidden=true;$('chat-room-view').hidden=true;$('chat-list-view').hidden=false;document.querySelector('.tabbar').classList.remove('hidden');if(!silent)renderConvs();}
 $('room-back').addEventListener('click',function(){closeChat(false);});
 
 function renderMsgs(){var box=$('msg-list');box.textContent='';var msgs=(CUR_FRIEND&&MSG[convKey(ME,CUR_FRIEND)])||[];var lastTs=0;msgs.forEach(function(m){var ts=tsOf(m);if(ts-lastTs>5*60*1000){var t=document.createElement('div');t.className='time-label';var s=document.createElement('span');s.textContent=fmtMsgTime(ts);t.appendChild(s);box.appendChild(t);}lastTs=ts;box.appendChild(buildMsg(m));});box.scrollTop=box.scrollHeight;}
@@ -779,7 +788,7 @@ function showProfile(uid,profileData){if(profileData){renderProfileView(uid,prof
 function renderProfileView(uid,p){var av=$('profile-avatar');av.innerHTML='';if(p.avatar){var img=document.createElement('img');img.src=p.avatar;av.appendChild(img);}else{av.textContent=uid.slice(-2);av.style.background=avatarColor(uid);}$('profile-nickname').textContent=p.nickname||'同学 '+uid;$('profile-id').textContent='ID：'+uid;var details=$('profile-details');details.textContent='';if(p.birthday){addRow(details,'生日',p.birthday);var age=calcAge(p.birthday);if(age!==null)addRow(details,'年龄',age+' 岁');var z=calcZodiac(p.birthday);if(z)addRow(details,'星座',z);}if(p.gender)addRow(details,'性别',p.gender);
 var extra=$('profile-extra');extra.textContent='';var actions=$('profile-actions');actions.textContent='';
 if(!p.is_self){
-if(p.is_friend){var noteBtn=document.createElement('button');noteBtn.textContent='设置备注'+(getFriendInfo(uid)&&getFriendInfo(uid).note?' · '+getFriendInfo(uid).note:'');noteBtn.addEventListener('click',function(){openNoteModal(uid);});extra.appendChild(noteBtn);var blockBtn=document.createElement('button');blockBtn.textContent=p.is_blocked?'取消屏蔽':'屏蔽 TA';if(p.is_blocked)blockBtn.style.color='#ef4444';blockBtn.addEventListener('click',function(){toggleBlock(uid,!p.is_blocked);});extra.appendChild(blockBtn);var btnMsg=document.createElement('button');btnMsg.className='btn-send-msg';btnMsg.textContent='发消息';btnMsg.addEventListener('click',function(){$('profile-overlay').classList.remove('active');showTab('chat');openChat(uid);});actions.appendChild(btnMsg);}else if(!p.is_blocked){var btnAdd=document.createElement('button');btnAdd.className='btn-add-friend';btnAdd.textContent='加好友';btnAdd.addEventListener('click',function(){btnAdd.disabled=true;btnAdd.textContent='添加中…';rpc('calc_add_friend',{p_token:TOKEN,p_friend_id:uid}).then(function(d){if(d.need_approval){toast('对方开启了好友验证');btnAdd.disabled=false;btnAdd.textContent='发送申请';btnAdd.onclick=function(){rpc('calc_send_friend_request',{p_token:TOKEN,p_to_id:uid}).then(function(d2){if(!d2.ok){toast(d2.error);}else{toast('申请已发送');notifyTo(uid,'friend');btnAdd.disabled=true;btnAdd.textContent='已发送';}}).catch(function(e){toast(e.message);});};return;}if(!d.ok){toast(d.error);btnAdd.disabled=false;btnAdd.textContent='加好友';return;}toast('已添加 同学 '+uid);notifyTo(uid,'friend');loadFriends().then(function(){btnAdd.disabled=true;btnAdd.textContent='已是好友';});}).catch(function(e){toast(e.message);btnAdd.disabled=false;btnAdd.textContent='加好友';});});actions.appendChild(btnAdd);}}$('profile-back').dataset.uid=uid;}
+if(p.is_friend){var noteBtn=document.createElement('button');noteBtn.textContent='设置备注'+(getFriendInfo(uid)&&getFriendInfo(uid).note?' · '+getFriendInfo(uid).note:'');noteBtn.addEventListener('click',function(){openNoteModal(uid);});extra.appendChild(noteBtn);var blockBtn=document.createElement('button');blockBtn.textContent=p.is_blocked?'取消屏蔽':'屏蔽 TA';if(p.is_blocked)blockBtn.style.color='#ef4444';blockBtn.addEventListener('click',function(){toggleBlock(uid,!p.is_blocked);});extra.appendChild(blockBtn);var btnMsg=document.createElement('button');btnMsg.className='btn-send-msg';btnMsg.textContent='发消息';btnMsg.addEventListener('click',function(){$('profile-overlay').classList.remove('active');showTab('chat');openChat(uid);});actions.appendChild(btnMsg);}else if(!p.is_blocked){var btnAdd=document.createElement('button');btnAdd.className='btn-add-friend';btnAdd.textContent='加好友';btnAdd.addEventListener('click',function(){btnAdd.disabled=true;btnAdd.textContent='添加中…';rpc('calc_add_friend',{p_token:TOKEN,p_friend_id:uid}).then(function(d){if(d.need_approval){toast('对方开启了好友验证');btnAdd.disabled=false;btnAdd.textContent='发送申请';btnAdd.onclick=function(){rpc('calc_send_friend_request',{p_token:TOKEN,p_to_id:uid}).then(function(d2){if(!d2.ok){toast(d2.error);}else{toast('申请已发送');notifyTo(uid,'friend');btnAdd.disabled=true;btnAdd.textContent='已发送';}}).catch(function(e){toast(e.message);});};return;}if(!d.ok){toast(d.error);btnAdd.disabled=false;btnAdd.textContent='加好友';return;}toast('已添加 同学 '+uid);sendGreeting(uid);notifyTo(uid,'friend');loadFriends().then(function(){btnAdd.disabled=true;btnAdd.textContent='已是好友';});}).catch(function(e){toast(e.message);btnAdd.disabled=false;btnAdd.textContent='加好友';});});actions.appendChild(btnAdd);}}$('profile-back').dataset.uid=uid;}
 function addRow(c,l,v){var r=document.createElement('div');r.className='profile-row';var lb=document.createElement('span');lb.className='profile-row-label';lb.textContent=l;var vl=document.createElement('span');vl.className='profile-row-value';vl.textContent=v;r.appendChild(lb);r.appendChild(vl);c.appendChild(r);}
 $('profile-back').addEventListener('click',function(){$('profile-overlay').classList.remove('active');});
 
@@ -797,13 +806,13 @@ $('block-back').addEventListener('click',function(){$('block-overlay').classList
 /* 编辑资料 */
 var EP_GENDER='',EP_AVATAR='';
 $('row-edit-profile').addEventListener('click',openEditProfile);
-function openEditProfile(){if(!MY_PROFILE)return;$('ep-nickname').value=MY_PROFILE.nickname||'';$('ep-birthday').value=MY_PROFILE.birthday||'';EP_GENDER=MY_PROFILE.gender||'';EP_AVATAR=MY_PROFILE.avatar||'';renderEpAvatar();document.querySelectorAll('.ep-gender-group button').forEach(function(b){b.classList.toggle('on',b.dataset.gender===EP_GENDER);});$('edit-profile-overlay').classList.add('active');}
+function openEditProfile(){if(!MY_PROFILE)return;$('ep-nickname').value=MY_PROFILE.nickname||'';$('ep-birthday').value=MY_PROFILE.birthday||'';$('ep-greeting').value=MY_PROFILE.greeting||DEFAULT_GREETING;EP_GENDER=MY_PROFILE.gender||'';EP_AVATAR=MY_PROFILE.avatar||'';renderEpAvatar();document.querySelectorAll('.ep-gender-group button').forEach(function(b){b.classList.toggle('on',b.dataset.gender===EP_GENDER);});$('edit-profile-overlay').classList.add('active');}
 function renderEpAvatar(){var av=$('ep-avatar');av.innerHTML='';if(EP_AVATAR){var img=document.createElement('img');img.src=EP_AVATAR;av.appendChild(img);}else{av.textContent=ME.slice(-2);av.style.background=avatarColor(ME);}}
 $('ep-avatar').addEventListener('click',function(){$('ep-avatar-input').click();});
 $('ep-avatar-input').addEventListener('change',function(e){var file=e.target.files[0];if(!file)return;if(file.size>200000){toast('头像文件太大，请选择 200KB 以内的图片');return;}var reader=new FileReader();reader.onload=function(ev){EP_AVATAR=ev.target.result;renderEpAvatar();};reader.readAsDataURL(file);});
 document.querySelectorAll('.ep-gender-group button').forEach(function(b){b.addEventListener('click',function(){EP_GENDER=b.dataset.gender;document.querySelectorAll('.ep-gender-group button').forEach(function(x){x.classList.toggle('on',x.dataset.gender===EP_GENDER);});});});
 $('ep-back').addEventListener('click',function(){$('edit-profile-overlay').classList.remove('active');});
-$('ep-save').addEventListener('click',function(){var nickname=$('ep-nickname').value.trim(),birthday=$('ep-birthday').value||null;rpc('calc_update_profile',{p_token:TOKEN,p_nickname:nickname,p_birthday:birthday,p_gender:EP_GENDER,p_avatar:EP_AVATAR||''}).then(function(d){if(!d.ok){toast(d.error);return;}toast('资料已保存');$('edit-profile-overlay').classList.remove('active');loadProfile().then(function(){renderMe();renderFriends();renderConvs();});}).catch(function(e){toast(e.message);});});
+$('ep-save').addEventListener('click',function(){var nickname=$('ep-nickname').value.trim(),birthday=$('ep-birthday').value||null,greeting=$('ep-greeting').value.trim()||DEFAULT_GREETING;rpc('calc_update_profile',{p_token:TOKEN,p_nickname:nickname,p_birthday:birthday,p_gender:EP_GENDER,p_avatar:EP_AVATAR||'',p_greeting:greeting}).then(function(d){if(!d.ok){toast(d.error);return;}toast('资料已保存');$('edit-profile-overlay').classList.remove('active');loadProfile().then(function(){renderMe();renderFriends();renderConvs();});}).catch(function(e){toast(e.message);});});
 
 /* 审批开关 */
 $('switch-approval').addEventListener('click',function(){var sw=$('switch-approval');if(sw.classList.contains('disabled'))return;var newVal=!sw.classList.contains('on');rpc('calc_set_approval',{p_token:TOKEN,p_require:newVal}).then(function(d){if(!d.ok){toast(d.error);return;}if(newVal)sw.classList.add('on');else sw.classList.remove('on');toast(newVal?'已开启好友验证':'已关闭好友验证');}).catch(function(e){toast(e.message);});});
@@ -818,7 +827,7 @@ $('btn-logout').addEventListener('click',function(){var t=TOKEN;stopEngine();cle
 function applyTheme(t){document.documentElement.setAttribute('data-theme',t);jset('oc_theme',t);$('theme-light').classList.toggle('on',t==='light');$('theme-dark').classList.toggle('on',t==='dark');}
 $('theme-light').addEventListener('click',function(){applyTheme('light');});
 $('theme-dark').addEventListener('click',function(){applyTheme('dark');});
-$('row-about').addEventListener('click',function(){toast('在线计算器 v1.3.0 · 简洁好用的计算工具');});
+$('row-about').addEventListener('click',function(){toast('在线计算器 v1.6.0 · 简洁好用的计算工具');});
 
 applyTheme(jget('oc_theme')||'light');renderCalc();showScreen('calc');
 })();
